@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    type: task
+spec:
+  selector:
+    matchLabels:
+      project: {{ .Release.Name }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        project: {{ .Release.Name }}
+        type: task
+        networking/allow-internet-egress: "true"
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      containers:
+        - name: {{ .Release.Name }}
+          image: {{ .Values.container.image }}
+          envFrom:
+            - secretRef:
+                name: {{ .Release.Name }}-env
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            runAsUser: 1001
+          livenessProbe:
+            httpGet:
+              path: /api/healthcheck
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /api/healthcheck
+              port: 80
+            failureThreshold: 20
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: {{ .Values.container.resources.requests.memory }}
+              cpu: {{ .Values.container.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.container.resources.limits.memory }}
+              cpu: {{ .Values.container.resources.limits.cpu }}
+          ports:
+            - containerPort: 80

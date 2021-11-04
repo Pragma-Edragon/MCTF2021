@@ -1,0 +1,13 @@
+version: "3.2"
+
+services:
+  laravel-app:
+    container_name: laravel-app
+    build:
+      context: .
+    restart: always
+    ports:
+      - "8000:80"
+    env_file:
+      - laravel-app/.env
+

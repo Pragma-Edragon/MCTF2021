@@ -1,0 +1,12 @@
+hostname: "kiss.tasks.mctf.online"
+replicas: 1
+container:
+  image: "cr.yandex/crpt9t5511h1iq7uauar/kiss:v2"
+  resources:
+    requests:
+      memory: "800Mi"
+      cpu: "400m"
+    limits:
+      memory: "1000Mi"
+      cpu: "800m"
+
